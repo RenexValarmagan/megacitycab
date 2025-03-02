@@ -1,12 +1,23 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JSP - Hello World</title>
+  <title>Login - MegaCityCab</title>
 </head>
 <body>
-<h1><%= "Hello World!" %></h1>
-<br/>
-<a href="hello-servlet">Hello Servlet</a>
+<h2>Login</h2>
+<% if (request.getParameter("error") != null) { %>
+<p style="color:red;">Invalid username or password!</p>
+<% } %>
+
+<form action="login" method="post">
+  <label>Username:</label>
+  <input type="text" name="username" required><br>
+
+  <label>Password:</label>
+  <input type="password" name="password" required><br>
+
+  <button type="submit">Login</button>
+</form>
 </body>
 </html>
