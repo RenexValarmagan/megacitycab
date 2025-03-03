@@ -19,7 +19,6 @@ public class LoginServlet extends HttpServlet {
         User user = UserDAO.authenticateUser(username, password);
 
         if (user != null) {
-            // Store user info in session
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("role", user.getRole());
@@ -27,11 +26,12 @@ public class LoginServlet extends HttpServlet {
             // Redirect based on role
             if ("admin".equals(user.getRole())) {
                 response.sendRedirect("admin-dashboard.jsp");
-            } else {
+            } else if ("customer".equals(user.getRole())) {
                 response.sendRedirect("customer-dashboard.jsp");
+            } else {
+                response.sendRedirect("index.jsp?error=invalid_role");
             }
         } else {
-            // Invalid login, redirect to login page with error message
             response.sendRedirect("index.jsp?error=true");
         }
     }
