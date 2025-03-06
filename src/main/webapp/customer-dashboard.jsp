@@ -1,30 +1,20 @@
+<%@ page import="com.bsc.megacitycab.models.Customer" %>
 <%@ page session="true" %>
-<%@ page import="com.bsc.megacitycab.models.User" %>
-
 <%
-    User loggedInUser = (User) session.getAttribute("user");
-    if (loggedInUser == null || !"customer".equals(loggedInUser.getRole())) {
-        response.sendRedirect("index.jsp");
+    // Retrieve the logged-in customer from the session
+    Customer loggedInCustomer = (Customer) session.getAttribute("customer");
+    if (loggedInCustomer == null) {
+        response.sendRedirect("index.jsp");  // If not logged in, redirect to login page
         return;
     }
 %>
-
 <html>
 <head>
     <title>Customer Dashboard</title>
 </head>
 <body>
-<h2>Welcome, <%= loggedInUser.getUsername() %>!</h2>
-
-<p>Your Role: <%= loggedInUser.getRole() %></p>
-
-<!-- Button to Book a Cab -->
-<form action="booking.jsp">
-    <button type="submit">Book a Cab</button>
-</form>
-
-<br>
-
+<h2>Welcome, <%= loggedInCustomer.getUsername() %>!</h2>
+<p>Your Role: customer</p>
 <a href="logout">Logout</a>
 </body>
 </html>

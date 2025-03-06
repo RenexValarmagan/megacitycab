@@ -157,13 +157,23 @@
     <% } %>
 
     <form action="register" method="post">
+        <label>Full Name:</label>
+        <input type="text" name="customer_name" required><br>
+
+        <label>NIC:</label>
+        <input type="text" name="nic" required><br>
+
+        <label>Phone Number:</label>
+        <input type="text" name="phone" required><br>
+
+        <label>Address:</label>
+        <input type="text" name="address" required><br>
+
         <label>Username:</label>
         <input type="text" name="username" required><br>
 
         <label>Password:</label>
         <input type="password" name="password" required><br>
-
-        <input type="hidden" name="role" value="customer">  <%-- Auto-assign "customer" role --%>
 
         <input type="submit" value="Register">
     </form>

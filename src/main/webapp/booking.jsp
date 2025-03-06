@@ -1,70 +1,114 @@
-<%@ page session="true" %>
-<%@ page import="com.bsc.megacitycab.models.User, java.sql.*" %>
-
+<%@ page import="java.sql.*, com.bsc.megacitycab.utils.DBConnection" %>
+<%@ page import="com.bsc.megacitycab.models.User" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // Get logged-in user details from session
-    User loggedInUser = (User) session.getAttribute("user");
+    HttpSession sessionObj = request.getSession();
+    User loggedInUser = (User) sessionObj.getAttribute("user");
+
     if (loggedInUser == null) {
-        response.sendRedirect("index.jsp"); // Redirect if not logged in
+        response.sendRedirect("index.jsp");
         return;
     }
+
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
 %>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Book a Cab</title>
+    <meta charset="UTF-8">
+    <title>Book a Ride</title>
 </head>
 <body>
-<h2>Cab Booking</h2>
+<h2>Book a Ride</h2>
 
 <form action="BookingServlet" method="post">
-    <label>Name:</label>
-    <input type="text" name="name" value="<%= loggedInUser.getUsername() %>" readonly><br>
-
-    <label>Pickup Location:</label>
-    <select name="pickupLocation" required>
+    <!-- Pickup Location -->
+    <label for="pickupLocation">Pickup Location:</label>
+    <select name="pickupLocation" id="pickupLocation" required>
+        <option value="">Select Pickup Location</option>
         <%
             try {
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/megacitycab", "root", "password");
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT id, name FROM locations");
+                conn = DBConnection.getConnection();
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery("SELECT id, name FROM locations");
                 while (rs.next()) {
         %>
         <option value="<%= rs.getInt("id") %>"><%= rs.getString("name") %></option>
         <%
                 }
-                con.close();
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("<p>Error fetching locations. Please try again later.</p>");
+            } finally {
+                try {
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                    if (conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         %>
-    </select><br>
+    </select>
+    <br>
 
-    <label>Drop Location:</label>
-    <select name="dropLocation" required>
+    <!-- Drop Location -->
+    <label for="dropLocation">Drop Location:</label>
+    <select name="dropLocation" id="dropLocation" required>
+        <option value="">Select Drop Location</option>
         <%
             try {
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/megacitycab", "root", "password");
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT id, name FROM locations");
+                // Re-initialize the ResultSet for drop location dropdown
+                conn = DBConnection.getConnection();
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery("SELECT id, name FROM locations");
                 while (rs.next()) {
         %>
         <option value="<%= rs.getInt("id") %>"><%= rs.getString("name") %></option>
         <%
                 }
-                con.close();
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("<p>Error fetching locations. Please try again later.</p>");
+            } finally {
+                try {
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                    if (conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         %>
-    </select><br>
+    </select>
+    <br>
 
-    <label>Select Vehicle:</label><br>
-    <input type="radio" name="vehicleType" value="Bike" required> Bike<br>
-    <input type="radio" name="vehicleType" value="Tuk Tuk" required> Tuk Tuk<br>
-    <input type="radio" name="vehicleType" value="Van" required> Van<br>
+    <!-- Vehicle Type -->
+    <label for="vehicleType">Vehicle Type:</label>
+    <select name="vehicleType" id="vehicleType" required>
+        <option value="">Select Vehicle Type</option>
+        <option value="Bike">Bike</option>
+        <option value="Tuk Tuk">Tuk Tuk</option>
+        <option value="Van">Van</option>
+    </select>
+    <br>
 
-    <button type="submit">Book Now</button>
+    <!-- Customer Address -->
+    <label for="address">Your Address:</label>
+    <input type="text" id="address" name="address" placeholder="Enter your address" required>
+    <br>
+
+    <!-- Customer Phone Number -->
+    <label for="phoneNumber">Your Phone Number:</label>
+    <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" required>
+    <br>
+
+    <!-- Submit Button -->
+    <input type="submit" value="Book Now">
 </form>
+
 </body>
 </html>
