@@ -11,9 +11,10 @@ public class Booking {
     private double fare;
 
     // Constructor using customer_id, location IDs, and vehicle_id
-    public Booking(String orderNumber, String customerName, String customerPhone,
+    public Booking(String orderNumber, Integer customerId, String customerName, String customerPhone,
                    int pickupLocationId, int dropLocationId, int vehicleId, double fare) {
-        this.customerId = customerId; // customer_id is now an int
+        this.customerId = customerId;
+        //this.customerId = this.customerId; // customer_id is now an int
         this.orderNumber = orderNumber;
         this.customerName = customerName;
         this.customerPhone = customerPhone;

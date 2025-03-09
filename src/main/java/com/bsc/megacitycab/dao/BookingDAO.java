@@ -3,13 +3,15 @@ package com.bsc.megacitycab.dao;
 import com.bsc.megacitycab.models.Booking;
 import com.bsc.megacitycab.utils.DBConnection;
 
+import jakarta.servlet.http.HttpSession;  // Make sure to import HttpSession
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class BookingDAO {
 
-    private Connection connection;
+    private final Connection connection;
 
     // Constructor to initialize connection
     public BookingDAO(Connection connection) throws SQLException {
@@ -19,15 +21,19 @@ public class BookingDAO {
 
     // Method to save the booking
     public void saveBooking(Booking booking) throws SQLException {
-        // Step 1: We now use customerId directly from the Booking object.
-        int customerId = booking.getCustomerId();  // We already have the customer_id directly
+        // Retrieve the customerId directly from the booking object
+        Integer customerId = booking.getCustomerId();
 
-        // Step 2: Insert the booking using customer_id
+        if (customerId == null) {
+            throw new SQLException("Customer ID is missing in the booking.");
+        }
+
+        // SQL query to insert booking details into the database
         String query = "INSERT INTO bookings (order_number, customer_id, customer_name, customer_phone, pickup_location_id, drop_location_id, vehicle_id, fare) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, booking.getOrderNumber());
-            ps.setInt(2, customerId);  // Use the customer_id obtained from the Booking object
+            ps.setInt(2, booking.getCustomerId());  // Using the customer_id passed in the booking object
             ps.setString(3, booking.getCustomerName());
             ps.setString(4, booking.getCustomerPhone());
             ps.setInt(5, booking.getPickupLocationId());
@@ -35,14 +41,16 @@ public class BookingDAO {
             ps.setInt(7, booking.getVehicleId());
             ps.setDouble(8, booking.getFare());
 
-            int rowsAffected = ps.executeUpdate();  // Execute the insert query
+            int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Booking successfully saved.");
+                System.out.println("Saving booking for customerId: " + booking.getCustomerId());
             } else {
                 throw new SQLException("Failed to save the booking.");
             }
         }
     }
+
 
     // Optionally, you could have a method to close the connection, if needed
     public void closeConnection() throws SQLException {

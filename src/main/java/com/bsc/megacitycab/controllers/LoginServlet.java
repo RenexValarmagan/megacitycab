@@ -39,7 +39,8 @@ public class LoginServlet extends HttpServlet {
                 // Customer login successful
                 HttpSession session = request.getSession();
                 session.setAttribute("customer", customer);  // Store customer in session
-                session.setAttribute("customerRegNumber", customer.getCustomerRegNumber());  // Store customer_reg_number in session
+                session.setAttribute("customerId", customer.getId());  // Store customerId in session
+                session.setAttribute("customerName", customer.getName());  // Store customer name in session
                 session.setAttribute("role", "customer");  // Set role as customer
 
                 // Redirect to customer dashboard

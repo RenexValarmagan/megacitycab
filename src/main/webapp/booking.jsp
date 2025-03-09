@@ -165,6 +165,8 @@
 
     <!-- Auto-generated Order Number -->
     <input type="hidden" name="orderNumber" value="<%= UUID.randomUUID().toString() %>" />
+    <input type="hidden" name="customerId" value="${customer != null ? customer.id : ''}" />
+
 
     <!-- Submit Button -->
     <button type="submit">Book Your Cab</button>
