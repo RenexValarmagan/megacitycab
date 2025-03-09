@@ -156,7 +156,7 @@
     <p class="success-message">Registration successful! You can now <a href="index.jsp">login</a>.</p>
     <% } %>
 
-    <form action="register" method="post">
+    <form name="registerForm" action="register" method="post" onsubmit="return validateForm(); ">
         <label>Full Name:</label>
         <input type="text" name="customer_name" required><br>
 
@@ -180,5 +180,7 @@
 
     <p>Already have an account? <a href="index.jsp">Login Here</a></p>
 </div>
+
+<script src="validateRegistration.js"></script>
 </body>
 </html>

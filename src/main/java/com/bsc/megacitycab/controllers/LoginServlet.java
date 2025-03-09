@@ -27,7 +27,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getId());  // Store user_id in session
-            session.setAttribute("role", user.getRole());
+            session.setAttribute("role", "admin");  // Set role as admin
 
             // Redirect to admin dashboard
             response.sendRedirect("admin-dashboard.jsp");
@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("customer", customer);  // Store customer in session
                 session.setAttribute("customerRegNumber", customer.getCustomerRegNumber());  // Store customer_reg_number in session
-                session.setAttribute("role", "customer");
+                session.setAttribute("role", "customer");  // Set role as customer
 
                 // Redirect to customer dashboard
                 response.sendRedirect("customer-dashboard.jsp");

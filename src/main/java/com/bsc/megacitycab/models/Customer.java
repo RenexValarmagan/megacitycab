@@ -7,6 +7,7 @@ public class Customer {
     private String nic;
     private String username;
     private String password;
+    private String phone;
 
     // Constructor for creating a Customer object (includes password)
     public Customer(String customerRegNumber, String name, String address, String nic, String username, String password) {
@@ -34,6 +35,7 @@ public class Customer {
     public String getNic() { return nic; }
     public String getUsername() { return username; }
     public String getPassword() { return password; }
+    public String getPhone() { return phone; }
 
     // Setters (optional, if you need to update customer details)
     public void setCustomerRegNumber(String customerRegNumber) { this.customerRegNumber = customerRegNumber; }

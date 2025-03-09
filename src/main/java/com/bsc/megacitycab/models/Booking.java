@@ -1,73 +1,105 @@
 package com.bsc.megacitycab.models;
 
 public class Booking {
+    private int customerId;         // customer_id (int)
     private String orderNumber;
-    private int customerId;
-    private String customerAddress; // New field for customer address
-    private String customerPhoneNumber; // New field for customer phone number
-    private int pickupLocationId;
-    private int dropLocationId;
-    private int vehicleId;
-    private int driverId;
+    private String customerName;
+    private String customerPhone;
+    private int pickupLocationId;   // pickup_location_id (int)
+    private int dropLocationId;     // drop_location_id (int)
+    private int vehicleId;          // vehicle_id (int)
     private double fare;
 
-    // Updated constructor with customer address and phone number
-    public Booking(String orderNumber, int customerId, String customerAddress, String customerPhoneNumber,
-                   int pickupLocationId, int dropLocationId, int vehicleId, int driverId, double fare) {
+    // Constructor using customer_id, location IDs, and vehicle_id
+    public Booking(String orderNumber, String customerName, String customerPhone,
+                   int pickupLocationId, int dropLocationId, int vehicleId, double fare) {
+        this.customerId = customerId; // customer_id is now an int
         this.orderNumber = orderNumber;
-        this.customerId = customerId;
-        this.customerAddress = customerAddress;
-        this.customerPhoneNumber = customerPhoneNumber;
-        this.pickupLocationId = pickupLocationId;
-        this.dropLocationId = dropLocationId;
-        this.vehicleId = vehicleId;
-        this.driverId = driverId;
+        this.customerName = customerName;
+        this.customerPhone = customerPhone;
+        this.pickupLocationId = pickupLocationId; // pickup_location_id is int
+        this.dropLocationId = dropLocationId;     // drop_location_id is int
+        this.vehicleId = vehicleId;               // vehicle_id is int
         this.fare = fare;
     }
 
-    // Getters and setters for new fields
-    public String getCustomerAddress() {
-        return customerAddress;
+    // Getters and Setters
+    public int getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomerAddress(String customerAddress) {
-        this.customerAddress = customerAddress;
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
-    public String getCustomerPhoneNumber() {
-        return customerPhoneNumber;
-    }
-
-    public void setCustomerPhoneNumber(String customerPhoneNumber) {
-        this.customerPhoneNumber = customerPhoneNumber;
-    }
-
-    // Existing getters
     public String getOrderNumber() {
         return orderNumber;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
     }
 
     public int getPickupLocationId() {
         return pickupLocationId;
     }
 
+    public void setPickupLocationId(int pickupLocationId) {
+        this.pickupLocationId = pickupLocationId;
+    }
+
     public int getDropLocationId() {
         return dropLocationId;
+    }
+
+    public void setDropLocationId(int dropLocationId) {
+        this.dropLocationId = dropLocationId;
     }
 
     public int getVehicleId() {
         return vehicleId;
     }
 
-    public int getDriverId() {
-        return driverId;
+    public void setVehicleId(int vehicleId) {
+        this.vehicleId = vehicleId;
     }
 
     public double getFare() {
         return fare;
+    }
+
+    public void setFare(double fare) {
+        this.fare = fare;
+    }
+
+    // Optional: Override toString for easier debugging/logging
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "customerId=" + customerId +
+                ", orderNumber='" + orderNumber + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", customerPhone='" + customerPhone + '\'' +
+                ", pickupLocationId=" + pickupLocationId +
+                ", dropLocationId=" + dropLocationId +
+                ", vehicleId=" + vehicleId +
+                ", fare=" + fare +
+                '}';
     }
 }
