@@ -19,11 +19,7 @@ public class BookingServlet extends HttpServlet {
     @Override
     public void init() {
         // Initialize the DAO with the connection
-        try {
-            bookingDAO = new BookingDAO(DBConnection.getConnection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        bookingDAO = new BookingDAO(DBConnection.getConnection());
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,47 +29,89 @@ public class BookingServlet extends HttpServlet {
             Integer customerId = (Integer) session.getAttribute("customerId");
             String customerName = (String) session.getAttribute("customerName");
 
-            System.out.println("Customer ID: " + customerId);
-            System.out.println("Customer Name: " + customerName);
-
             if (customerId == null || customerName == null) {
                 response.sendRedirect("index.jsp");
                 return;
             }
 
-            // Extract form parameters
-            String orderNumber = generateOrderNumber(); // Auto-generate the order number
+            // Extract form parameters and handle missing parameters
             String customerPhone = request.getParameter("customerPhone");
-            int pickupLocationId = Integer.parseInt(request.getParameter("pickupLocationId"));
-            int dropLocationId = Integer.parseInt(request.getParameter("dropLocationId"));
-            int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
-            double fare = calculateFare(pickupLocationId, dropLocationId, vehicleId); // Calculate fare based on the selected options
+            if (customerPhone == null || customerPhone.isEmpty()) {
+                request.setAttribute("error", "Phone number is required.");
+                request.getRequestDispatcher("bookingForm.jsp").forward(request, response);
+                return;
+            }
 
-            // Create a new Booking object
-            Booking booking = new Booking(orderNumber, customerId, customerName, customerPhone, pickupLocationId, dropLocationId, vehicleId, fare);
+            int pickupLocationId = parseInt(request.getParameter("pickupLocationId"));
+            int dropLocationId = parseInt(request.getParameter("dropLocationId"));
+            int vehicleId = parseInt(request.getParameter("vehicleId"));
 
-            // Save the booking in the database
+            // Validate the IDs (they should be positive integers)
+            if (pickupLocationId <= 0 || dropLocationId <= 0 || vehicleId <= 0) {
+                request.setAttribute("error", "Invalid location or vehicle selection.");
+                request.getRequestDispatcher("bookingForm.jsp").forward(request, response);
+                return;
+            }
+
+            double fare = calculateFare(pickupLocationId, dropLocationId, vehicleId); // Calculate fare
+// Retrieve an available driver (if any)
+            int driverId = bookingDAO.getAvailableDriverId();
+
+// Create a new Booking object with the assigned driverId (or null if no driver available)
+            Booking booking = new Booking(generateOrderNumber(), customerId, customerName, customerPhone, pickupLocationId, dropLocationId, vehicleId, (driverId != -1) ? driverId : null, fare);
+
+// Save the booking in the database
             bookingDAO.saveBooking(booking);
 
-            // Redirect to a success page
+// Check if the driver was assigned after the save operation
+            if (booking.getDriverId() == null) {
+                request.setAttribute("error", "No available driver for this booking.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+
+// Booking is successful, redirect to the success page
             response.sendRedirect("success.jsp");
+
 
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            request.setAttribute("error", "Error processing booking: " + e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 
-    // Example method to calculate fare
+
+    // Example method to calculate fare (implement actual logic)
     private double calculateFare(int pickupLocationId, int dropLocationId, int vehicleId) {
-        // Implement fare calculation based on the selected locations and vehicle type
-        // For now, return a fixed fare as an example
-        return 100.0;  // Replace this with your actual fare calculation logic
+        // Replace with your actual fare calculation logic
+        return 100.0;  // Sample fixed fare for now
+    }
+
+    // Method to safely parse integers from request parameters
+    private int parseInt(String param) {
+        try {
+            return Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+            return -1; // Invalid value
+        }
     }
 
     // Generate a unique order number (simplified version)
     private String generateOrderNumber() {
-        // Implement a method to generate a unique order number (for example, using timestamp or UUID)
+        // Implement a method to generate a unique order number (e.g., UUID)
         return "ORD" + System.currentTimeMillis(); // Example order number based on timestamp
+    }
+
+    @Override
+    public void destroy() {
+        // Close the database connection when the servlet is destroyed
+        try {
+            if (bookingDAO != null) {
+                bookingDAO.closeConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

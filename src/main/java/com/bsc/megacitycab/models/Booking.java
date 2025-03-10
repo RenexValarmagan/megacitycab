@@ -8,19 +8,20 @@ public class Booking {
     private int pickupLocationId;   // pickup_location_id (int)
     private int dropLocationId;     // drop_location_id (int)
     private int vehicleId;          // vehicle_id (int)
+    private Integer driverId;       // driver_id (Integer), can be NULL in DB
     private double fare;
 
-    // Constructor using customer_id, location IDs, and vehicle_id
-    public Booking(String orderNumber, Integer customerId, String customerName, String customerPhone,
-                   int pickupLocationId, int dropLocationId, int vehicleId, double fare) {
+    // Constructor including driverId
+    public Booking(String orderNumber, int customerId, String customerName, String customerPhone,
+                   int pickupLocationId, int dropLocationId, int vehicleId, Integer driverId, double fare) {
         this.customerId = customerId;
-        //this.customerId = this.customerId; // customer_id is now an int
         this.orderNumber = orderNumber;
         this.customerName = customerName;
         this.customerPhone = customerPhone;
-        this.pickupLocationId = pickupLocationId; // pickup_location_id is int
-        this.dropLocationId = dropLocationId;     // drop_location_id is int
-        this.vehicleId = vehicleId;               // vehicle_id is int
+        this.pickupLocationId = pickupLocationId;
+        this.dropLocationId = dropLocationId;
+        this.vehicleId = vehicleId;
+        this.driverId = driverId;  // New field added
         this.fare = fare;
     }
 
@@ -81,6 +82,14 @@ public class Booking {
         this.vehicleId = vehicleId;
     }
 
+    public Integer getDriverId() {
+        return driverId;  // Return Integer, which can be null
+    }
+
+    public void setDriverId(Integer driverId) {
+        this.driverId = driverId;
+    }
+
     public double getFare() {
         return fare;
     }
@@ -89,7 +98,7 @@ public class Booking {
         this.fare = fare;
     }
 
-    // Optional: Override toString for easier debugging/logging
+    // Override toString for debugging/logging
     @Override
     public String toString() {
         return "Booking{" +
@@ -100,6 +109,7 @@ public class Booking {
                 ", pickupLocationId=" + pickupLocationId +
                 ", dropLocationId=" + dropLocationId +
                 ", vehicleId=" + vehicleId +
+                ", driverId=" + driverId +  // Added driverId
                 ", fare=" + fare +
                 '}';
     }
