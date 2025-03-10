@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 
 public class BookingServlet extends HttpServlet {
@@ -54,25 +56,33 @@ public class BookingServlet extends HttpServlet {
             }
 
             double fare = calculateFare(pickupLocationId, dropLocationId, vehicleId); // Calculate fare
-// Retrieve an available driver (if any)
+            // Retrieve an available driver (if any)
             int driverId = bookingDAO.getAvailableDriverId();
 
-// Create a new Booking object with the assigned driverId (or null if no driver available)
+            // Create a new Booking object with the assigned driverId (or null if no driver available)
             Booking booking = new Booking(generateOrderNumber(), customerId, customerName, customerPhone, pickupLocationId, dropLocationId, vehicleId, (driverId != -1) ? driverId : null, fare);
 
-// Save the booking in the database
+            // Save the booking in the database
             bookingDAO.saveBooking(booking);
 
-// Check if the driver was assigned after the save operation
+            // Check if the driver was assigned after the save operation
             if (booking.getDriverId() == null) {
                 request.setAttribute("error", "No available driver for this booking.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
 
-// Booking is successful, redirect to the success page
-            response.sendRedirect("success.jsp");
+            // Set booking details as request attributes
+            request.setAttribute("orderNumber", booking.getOrderNumber());
+            request.setAttribute("customerName", booking.getCustomerName());
+            request.setAttribute("customerPhone", booking.getCustomerPhone());
+            request.setAttribute("pickupLocation", booking.getPickupLocationId());
+            request.setAttribute("dropLocation", booking.getDropLocationId());
+            request.setAttribute("vehicleId", booking.getVehicleId());
+            request.setAttribute("fare", booking.getFare());
 
+            // Forward to bookingConfirmation.jsp
+            request.getRequestDispatcher("bookingConfirmation.jsp").forward(request, response);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,6 +90,7 @@ public class BookingServlet extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
+
 
 
     // Example method to calculate fare (implement actual logic)
