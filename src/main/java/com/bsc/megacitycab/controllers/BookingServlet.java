@@ -12,6 +12,9 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class BookingServlet extends HttpServlet {
@@ -93,11 +96,55 @@ public class BookingServlet extends HttpServlet {
 
 
 
-    // Example method to calculate fare (implement actual logic)
     private double calculateFare(int pickupLocationId, int dropLocationId, int vehicleId) {
-        // Replace with your actual fare calculation logic
-        return 100.0;  // Sample fixed fare for now
+        double baseFare = 100.0; // Fixed fare for the first 1 km
+        double perKmRate = 0.0;
+        double distance = 0.0;
+
+        // Database query for fetching the distance between pickup and drop locations
+        try (Connection conn = DBConnection.getConnection()) {
+            // Step 1: Fetch the distance from distances table
+            String distanceQuery = "SELECT distance FROM distances WHERE pickup_id = ? AND drop_id = ?";
+            try (PreparedStatement distanceStmt = conn.prepareStatement(distanceQuery)) {
+                distanceStmt.setInt(1, pickupLocationId);
+                distanceStmt.setInt(2, dropLocationId);
+                ResultSet distanceRs = distanceStmt.executeQuery();
+                if (distanceRs.next()) {
+                    distance = distanceRs.getDouble("distance");
+                }
+            }
+
+            // Step 2: Get the vehicle type and assign per km rate
+            String vehicleQuery = "SELECT type FROM vehicles WHERE id = ?";
+            try (PreparedStatement vehicleStmt = conn.prepareStatement(vehicleQuery)) {
+                vehicleStmt.setInt(1, vehicleId);
+                ResultSet vehicleRs = vehicleStmt.executeQuery();
+                if (vehicleRs.next()) {
+                    String vehicleType = vehicleRs.getString("type");
+                    switch (vehicleType) {
+                        case "Bike":
+                            perKmRate = 80; // Bike fare per km
+                            break;
+                        case "TUK TUK":
+                            perKmRate = 100; // TUK TUK fare per km
+                            break;
+                        case "Car":
+                            perKmRate = 120; // Car fare per km
+                            break;
+                        default:
+                            perKmRate = 120; // Default to Car fare per km
+                            break;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Step 3: Calculate total fare
+        return (distance <= 1) ? baseFare : baseFare + (distance - 1) * perKmRate;
     }
+
 
     // Method to safely parse integers from request parameters
     private int parseInt(String param) {
