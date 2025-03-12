@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingDAO {
-    private final Connection connection;
+    private Connection connection;  // Make this instance-level
 
     // Constructor using passed connection
     public BookingDAO(Connection connection) {
-        this.connection = connection;
+        this.connection = connection; // Initialize the instance variable
     }
 
     // Modify the saveBooking method to return the driverId
@@ -71,7 +71,6 @@ public class BookingDAO {
         }
     }
 
-
     // Get an available driver ID, or return -1 if no drivers are available
     public int getAvailableDriverId() throws SQLException {
         String query = "SELECT id FROM drivers WHERE status = 'Available' LIMIT 1";
@@ -96,19 +95,19 @@ public class BookingDAO {
         }
     }
 
+    // This method should not be static because it's using the instance-level connection
     public List<Booking> getBookingsByCustomerId(int customerId) {
         List<Booking> bookings = new ArrayList<>();
         String query = "SELECT b.order_number, b.customer_id, b.customer_name, b.customer_phone, " +
                 "b.pickup_location_id, p.name AS pickup_location_name, " +
                 "b.drop_location_id, d.name AS drop_location_name, " +
-                "b.vehicle_id, v.type AS vehicle_type, " +  // FIXED: Changed v.name to v.type
+                "b.vehicle_id, v.type AS vehicle_type, " +
                 "b.driver_id, b.fare " +
                 "FROM bookings b " +
                 "JOIN locations p ON b.pickup_location_id = p.id " +
                 "JOIN locations d ON b.drop_location_id = d.id " +
                 "JOIN vehicles v ON b.vehicle_id = v.id " +
                 "WHERE b.customer_id = ?";
-
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, customerId);
@@ -140,8 +139,47 @@ public class BookingDAO {
         return bookings;
     }
 
+    // This method is non-static, ensuring proper access to the instance-level connection
+    public List<Booking> getAllBookings() {
+        List<Booking> bookings = new ArrayList<>();
+        String query = "SELECT b.order_number, b.customer_id, b.customer_name, b.customer_phone, " +
+                "b.pickup_location_id, p.name AS pickup_location_name, " +
+                "b.drop_location_id, d.name AS drop_location_name, " +
+                "b.vehicle_id, v.type AS vehicle_type, " +
+                "b.driver_id, b.fare " +
+                "FROM bookings b " +
+                "JOIN locations p ON b.pickup_location_id = p.id " +
+                "JOIN locations d ON b.drop_location_id = d.id " +
+                "JOIN vehicles v ON b.vehicle_id = v.id";
 
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
 
+            while (resultSet.next()) {
+                Booking booking = new Booking(
+                        resultSet.getString("order_number"),
+                        resultSet.getInt("customer_id"),
+                        resultSet.getString("customer_name"),
+                        resultSet.getString("customer_phone"),
+                        resultSet.getInt("pickup_location_id"),
+                        resultSet.getInt("drop_location_id"),
+                        resultSet.getInt("vehicle_id"),
+                        resultSet.getInt("driver_id"),
+                        resultSet.getDouble("fare")
+                );
+
+                // Set the readable names
+                booking.setPickupLocationName(resultSet.getString("pickup_location_name"));
+                booking.setDropLocationName(resultSet.getString("drop_location_name"));
+                booking.setVehicleName(resultSet.getString("vehicle_type"));
+
+                bookings.add(booking);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bookings;
+    }
 
     // Close connection method
     public void closeConnection() throws SQLException {

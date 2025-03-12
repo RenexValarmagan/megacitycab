@@ -50,4 +50,37 @@ public class VehiclesDAO {
         }
         return vehicles;
     }
+
+    public boolean updateVehicle(int vehicleId, String type, String status) {
+        String query = "UPDATE vehicles SET type = ?, status = ? WHERE id = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setString(1, type);
+            ps.setString(2, status);
+            ps.setInt(3, vehicleId);
+
+            int updatedRows = ps.executeUpdate();
+            return updatedRows > 0; // Returns true if update was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteVehicle(int vehicleId) {
+        String query = "DELETE FROM vehicles WHERE id = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setInt(1, vehicleId);
+            int deletedRows = ps.executeUpdate();
+            return deletedRows > 0; // Returns true if delete was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }
