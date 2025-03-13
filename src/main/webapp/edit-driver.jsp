@@ -26,44 +26,131 @@
     List<Vehicle> vehicles = VehiclesDAO.getAllVehicles();
 %>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Driver</title>
+    <style>
+        /* General Reset and Layout */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .form-container input,
+        .form-container select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .form-container select {
+            background-color: #f9f9f9;
+        }
+
+        .form-container input:focus,
+        .form-container select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .form-container {
+                padding: 15px;
+            }
+
+            .form-container input,
+            .form-container select {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .form-container input[type="submit"] {
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
+
 <h2>Edit Driver</h2>
-<form action="DriverServlet" method="post">
-    <%--@declare id="vehicle"--%><%--@declare id="status"--%><%--@declare id="phone"--%><%--@declare id="name"--%>
-    <input type="hidden" name="action" value="edit">
-    <input type="hidden" name="driverId" value="<%= driver.getId() %>">
 
-    <label for="name">Name:</label><br>
-    <input type="text" name="name" value="<%= driver.getName() %>" required><br>
+<div class="form-container">
+    <form action="DriverServlet" method="post">
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="driverId" value="<%= driver.getId() %>">
 
-    <label for="phone">Phone:</label><br>
-    <input type="text" name="phone" value="<%= driver.getPhone() %>" required><br>
+        <label for="name">Name:</label>
+        <input type="text" name="name" value="<%= driver.getName() %>" required>
 
-    <label for="status">Status:</label><br>
-    <select name="status">
-        <option value="Active" <%= "Available".equals(driver.getStatus()) ? "selected" : "" %>>Available</option>
-        <option value="Inactive" <%= "On Duty".equals(driver.getStatus()) ? "selected" : "" %>>On Duty</option>
-    </select><br>
+        <label for="phone">Phone:</label>
+        <input type="text" name="phone" value="<%= driver.getPhone() %>" required>
 
-    <label for="vehicle">Vehicle:</label><br>
-    <select name="vehicle_id">
-        <option value="0" <%= driver.getVehicleId() == 0 ? "selected" : "" %>>No Vehicle</option>
-        <% for (Vehicle vehicle : vehicles) { %>
-        <option value="<%= vehicle.getId() %>" <%= vehicle.getId() == driver.getVehicleId() ? "selected" : "" %>><%= vehicle.getType() %></option>
-        <% } %>
-    </select><br>
+        <label for="status">Status:</label>
+        <select name="status">
+            <option value="Active" <%= "Available".equals(driver.getStatus()) ? "selected" : "" %>>Available</option>
+            <option value="Inactive" <%= "On Duty".equals(driver.getStatus()) ? "selected" : "" %>>On Duty</option>
+        </select>
 
-    <input type="submit" value="Update Driver">
-</form>
+        <label for="vehicle">Vehicle:</label>
+        <select name="vehicle_id">
+            <option value="0" <%= driver.getVehicleId() == 0 ? "selected" : "" %>>No Vehicle</option>
+            <% for (Vehicle vehicle : vehicles) { %>
+            <option value="<%= vehicle.getId() %>" <%= vehicle.getId() == driver.getVehicleId() ? "selected" : "" %>><%= vehicle.getType() %></option>
+            <% } %>
+        </select>
+
+        <input type="submit" value="Update Driver">
+    </form>
+</div>
 
 </body>
 </html>
