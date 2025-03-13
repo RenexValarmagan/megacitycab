@@ -61,6 +61,30 @@
         <url-pattern>/BookingServlet</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>VehicleServlet</servlet-name>
+        <servlet-class>com.bsc.megacitycab.controllers.VehicleServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VehicleServlet</servlet-name>
+        <url-pattern>/VehicleServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DriverServlet</servlet-name>
+        <servlet-class>com.bsc.megacitycab.controllers.DriverServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DriverServlet</servlet-name>
+        <url-pattern>/DriverServlet</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
 
 
 

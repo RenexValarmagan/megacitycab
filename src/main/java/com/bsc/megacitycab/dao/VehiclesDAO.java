@@ -12,28 +12,37 @@ import java.util.List;
 
 public class VehiclesDAO {
 
-    public static int getVehicleId(String vehicleType) {
-        int vehicleId = -1;
-        String query = "SELECT id FROM vehicles WHERE type = ?";
+    public static Vehicle getVehicleById(int vehicleId) {
+        Vehicle vehicle = null;
+        String query = "SELECT id, type, status FROM vehicles WHERE id = ?";
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, vehicleType);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                vehicleId = resultSet.getInt("id");
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setInt(1, vehicleId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    vehicle = new Vehicle(
+                            rs.getInt("id"),
+                            rs.getString("type"),
+                            rs.getString("status")
+                    );
+                }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return vehicleId;
+        return vehicle;
     }
 
-    // ✅ New method to fetch vehicle IDs and names
+
+    // Fetch all vehicles with ID, type, and status
     public static List<Vehicle> getAllVehicles() {
         List<Vehicle> vehicles = new ArrayList<>();
-        String query = "SELECT id, type FROM vehicles";
+        String query = "SELECT id, type, status FROM vehicles";  // Fetch 'status' field too
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(query);
@@ -42,7 +51,8 @@ public class VehiclesDAO {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String type = rs.getString("type");
-                vehicles.add(new Vehicle(id, type));
+                String status = rs.getString("status");  // Fetch 'status' from database
+                vehicles.add(new Vehicle(id, type, status));  // Pass 'status' to the constructor
             }
 
         } catch (SQLException e) {
@@ -51,36 +61,63 @@ public class VehiclesDAO {
         return vehicles;
     }
 
-    public boolean updateVehicle(int vehicleId, String type, String status) {
+    // Update vehicle type and status by vehicle ID
+    public static boolean updateVehicle(Vehicle vehicle) {
         String query = "UPDATE vehicles SET type = ?, status = ? WHERE id = ?";
+
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
 
-            ps.setString(1, type);
-            ps.setString(2, status);
-            ps.setInt(3, vehicleId);
+            ps.setString(1, vehicle.getType());
+            ps.setString(2, vehicle.getStatus());
+            ps.setInt(3, vehicle.getId());
 
-            int updatedRows = ps.executeUpdate();
-            return updatedRows > 0; // Returns true if update was successful
+            // Execute the update and check if any rows were affected
+            return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
-    public boolean deleteVehicle(int vehicleId) {
+
+
+    // Delete vehicle by ID
+    public static boolean deleteVehicle(int vehicleId) {
         String query = "DELETE FROM vehicles WHERE id = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(query)) {
 
             ps.setInt(1, vehicleId);
             int deletedRows = ps.executeUpdate();
-            return deletedRows > 0; // Returns true if delete was successful
+            return deletedRows > 0;  // Returns true if delete was successful
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+
+    public boolean addVehicle(Vehicle newVehicle) {
+        String query = "INSERT INTO vehicles (type, status) VALUES (?, ?)";  // Correct the query for insertion
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            // Set the parameters for the prepared statement
+            ps.setString(1, newVehicle.getType());
+            ps.setString(2, newVehicle.getStatus());
+
+            // Execute the update
+            int insertedRows = ps.executeUpdate();
+
+            // If insertion was successful, return true
+            return insertedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();  // Log any errors
+            return false;  // Return false if there is an error
+        }
+    }
+
 
 
 }
