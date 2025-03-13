@@ -233,8 +233,8 @@
             <label for="status">Status:</label><br>
             <label>
               <select name="status">
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="Available">Available</option>
+                <option value="On Duty">On Duty</option>
               </select>
             </label><br>
             <label for="vehicle">Vehicle:</label><br>
